@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a change or a new capability.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before you ask for a change to how something fundamental works, check [the decisions folder](https://github.com/cptApe/just-a-wrapper/blob/main/docs/decisions/README.md). It explains why the app is built the way it is.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What you are trying to do and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What should happen instead. Describe the behavior, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other ways to solve it, including changing your fork's configuration.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Who it is for
+      options:
+        - Everyone running this app
+        - My fork or niche only
+        - Not sure
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to open a pull request for this.

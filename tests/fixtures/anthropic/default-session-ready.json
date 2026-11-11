@@ -1,0 +1,87 @@
+{
+  "description": "Live Managed Agents session: Default (sonnet-4-6) agent, single kickoff, no tools..",
+  "recorded_at": "2026-06-10",
+  "kickoff": "Reply with exactly: \"ready\". Do not use any tools.",
+  "event_types": [
+    "session.status_running",
+    "session.thread_status_running",
+    "user.message",
+    "span.model_request_start",
+    "agent.message",
+    "span.model_request_end",
+    "session.thread_status_idle",
+    "session.status_idle"
+  ],
+  "events": [
+    {
+      "id": "sevt_01Xv37KiZoZJTZJPSMkQqhut",
+      "processed_at": "2026-06-10T18:52:48.848566Z",
+      "type": "session.status_running"
+    },
+    {
+      "agent_name": "just-a-wrapper/default/preview",
+      "id": "sevt_01SBfFoYceHohRTsUJeNgPgm",
+      "processed_at": "2026-06-10T18:52:48.848567Z",
+      "session_thread_id": "sthr_01JLi6ZdaKmsPeEcwG1FjgC6",
+      "type": "session.thread_status_running"
+    },
+    {
+      "content": [
+        {
+          "text": "Reply with exactly: \"ready\". Do not use any tools.",
+          "type": "text"
+        }
+      ],
+      "id": "sevt_0188Z49reMufwXmyNvfjq76k",
+      "processed_at": "2026-06-10T18:52:50.718981Z",
+      "type": "user.message"
+    },
+    {
+      "id": "sevt_0136vgCcGn1JxCYJqfQY2ZTB",
+      "processed_at": "2026-06-10T18:52:50.718982Z",
+      "type": "span.model_request_start"
+    },
+    {
+      "content": [
+        {
+          "text": "ready",
+          "type": "text"
+        }
+      ],
+      "id": "sevt_01C2GNagmvkHNLNWAJHQaMNC",
+      "processed_at": "2026-06-10T18:52:50.718983Z",
+      "type": "agent.message"
+    },
+    {
+      "id": "sevt_01F9qwRbnbXDkyKuUVrF3UGy",
+      "is_error": false,
+      "model_request_start_id": "sevt_0136vgCcGn1JxCYJqfQY2ZTB",
+      "model_usage": {
+        "cache_creation_input_tokens": 5535,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 3,
+        "output_tokens": 4
+      },
+      "processed_at": "2026-06-10T18:52:50.718984Z",
+      "type": "span.model_request_end"
+    },
+    {
+      "agent_name": "just-a-wrapper/default/preview",
+      "id": "sevt_01V4cGEyLwd144oxX8qhmxo7",
+      "processed_at": "2026-06-10T18:52:50.943286Z",
+      "session_thread_id": "sthr_01JLi6ZdaKmsPeEcwG1FjgC6",
+      "stop_reason": {
+        "type": "end_turn"
+      },
+      "type": "session.thread_status_idle"
+    },
+    {
+      "id": "sevt_01Be5g7nToiQ4yUFyKNLZMf2",
+      "processed_at": "2026-06-10T18:52:50.943287Z",
+      "stop_reason": {
+        "type": "end_turn"
+      },
+      "type": "session.status_idle"
+    }
+  ]
+}

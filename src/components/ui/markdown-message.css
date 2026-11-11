@@ -1,0 +1,24 @@
+[data-markdown-root] .markdown-code-token {
+  color: var(--markdown-code-light);
+}
+
+.dark [data-markdown-root] .markdown-code-token {
+  color: var(--markdown-code-dark);
+}
+
+/* A small table stretches naturally; only genuinely wide tables reserve the
+   reference's 128px columns and a wider prose column before scrolling. */
+[data-markdown-table] th,
+[data-markdown-table] td {
+  min-width: 6rem;
+}
+
+[data-markdown-table]:has(th:nth-child(5)) th,
+[data-markdown-table]:has(th:nth-child(5)) td {
+  min-width: 8rem;
+}
+
+[data-markdown-table]:has(th:nth-child(5)) th:nth-child(3),
+[data-markdown-table]:has(th:nth-child(5)) td:nth-child(3) {
+  min-width: 16rem;
+}

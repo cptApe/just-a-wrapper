@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    // Local-only API routes are enabled through Next pageExtensions.
+    "src/app/api/dev/**/*.{ts,tsx}",
+    // Operator-editable brand configuration is an intentional customization API.
+    "content/brand.ts",
+    // Custom ESLint rules are loaded by name from eslint.config.mjs.
+    "eslint-rules/**/*.mjs",
+    // These are the sole server/client analytics capture funnels allowed by ESLint.
+    "src/lib/analytics-client.ts",
+    "src/lib/analytics.ts",
+    // Tests are execution roots, including dynamically discovered Node test files.
+    "tests/**/*.{ts,mjs,js}"
+  ],
+  // `pnpm stripe:listen` runs the Stripe CLI, which developers install themselves.
+  "ignoreBinaries": ["stripe"],
+  "ignore": [
+    // The generated Untitled UI icon catalog is selected by named imports downstream.
+    "src/components/icons/**"
+  ]
+}

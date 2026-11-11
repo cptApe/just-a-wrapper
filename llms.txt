@@ -1,0 +1,42 @@
+# Just a Wrapper
+
+> Just a Wrapper is an open-source, self-hosted AI workspace for teams, built on Claude Managed Agents. It gives users chat with agents, a file library, memory, skills, connected apps through Composio, scheduled tasks, team workspaces and optional Stripe credits billing. It is a Next.js 16 and React 19 app with Postgres (Neon) through Drizzle and Better Auth, MIT licensed, and designed to be forked and rebranded as a vertical AI product.
+
+Key facts:
+
+- Anthropic's Claude Managed Agents runs the agent loop, containers, memory stores, skills, vaults and scheduled runs. The app adds accounts, workspaces, files, permissions, billing and the interface.
+- Three model tiers: Fast (Claude Haiku), Balanced (Claude Sonnet) and Expert (Claude Opus), set in `src/features/agents/config.ts`.
+- Optional providers (Composio, Stripe, Resend, Exa, Browserbase, Vercel Blob, Vercel AI Gateway, PostHog) turn on when their keys are set and are resolved once in `src/lib/capabilities.ts`.
+- Local setup: `pnpm install`, `pnpm run setup`, `pnpm dev`. Quality gate: `pnpm verify`.
+- Live demo: https://wrapper.arnas.st
+- Source: https://github.com/cptApe/just-a-wrapper
+- Not affiliated with Anthropic.
+
+## Docs
+
+- [README](https://github.com/cptApe/just-a-wrapper/blob/main/README.md): what it is, features, quick start, deploy and FAQ
+- [Deploy to Vercel](https://github.com/cptApe/just-a-wrapper/blob/main/docs/deploy.md): migrations, agent seeding, webhooks, scheduled jobs
+- [Operator commands](https://github.com/cptApe/just-a-wrapper/blob/main/docs/operations.md): every `pnpm` command that changes external state
+- [Configuration map](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/03b-configuration-map.md): which file holds each setting
+- [Environment template](https://github.com/cptApe/just-a-wrapper/blob/main/.env.example): every environment variable with a one-line explanation
+
+## Architecture
+
+- [Spec map](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/00-start-here.md): where each answer lives and the reading order
+- [Foundation](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/02-foundation.md): Managed Agents primitives, the MCP proxy, files, real-time state, billing and key flows
+- [Patterns](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/03-patterns.md): feature folders, routes, environment validation and the custom-tool contract
+- [Privacy model](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/13-privacy.md): who can read and write each resource
+- [Design decisions](https://github.com/cptApe/just-a-wrapper/blob/main/docs/decisions/README.md): why it is built this way
+
+## Contributing
+
+- [Contributing guide](https://github.com/cptApe/just-a-wrapper/blob/main/CONTRIBUTING.md)
+- [Code standard](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/01-code-standard.md)
+- [Agent instructions](https://github.com/cptApe/just-a-wrapper/blob/main/AGENTS.md): rules for coding agents working in the repository
+
+## Optional
+
+- [Customization playbooks](https://github.com/cptApe/just-a-wrapper/tree/main/.claude/skills): Claude Code skills that rebrand, retheme and reprice a fork
+- [Design system](https://github.com/cptApe/just-a-wrapper/blob/main/docs/spec/08-design-system.md)
+- [Changelog](https://github.com/cptApe/just-a-wrapper/blob/main/CHANGELOG.md)
+- [Security policy](https://github.com/cptApe/just-a-wrapper/blob/main/SECURITY.md)

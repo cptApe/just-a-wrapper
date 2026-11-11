@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+# Supply-chain guard: never install package versions
+# younger than 7 days — npm attacks ship malware in fresh releases and are
+# typically yanked within days. Emergency bypass: minimumReleaseAgeExclude.
+minimumReleaseAge: 10080

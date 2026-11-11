@@ -1,0 +1,43 @@
+# Local development database: plain Postgres behind Neon's WebSocket proxy, so
+# the app runs without a Neon account. See .claude/skills/run-locally/SKILL.md.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Then put these two lines in .env:
+#   DATABASE_URL=postgres://dev:dev@localhost:55434/agentcore
+#   DATABASE_WS_PROXY=localhost:54446/v1
+#
+# Ports avoid the test stack (55432 / 54444) and a host Postgres on 5432.
+# Data lives in the named volume; `down -v` deletes it.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: agentcore
+    ports:
+      - '127.0.0.1:55434:5432'
+    volumes:
+      - agentcore-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dev -d agentcore']
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+  # Bridges the driver's WebSocket protocol to Postgres. The /v1 path is required.
+  wsproxy:
+    image: ghcr.io/neondatabase/wsproxy:latest
+    environment:
+      APPEND_PORT: 'postgres:5432'
+      ALLOW_ADDR_REGEX: '.*'
+      LOG_TRAFFIC: 'false'
+    ports:
+      - '127.0.0.1:54446:80'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  agentcore-dev-data:
