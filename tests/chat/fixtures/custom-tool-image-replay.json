@@ -1,0 +1,244 @@
+[
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_013a4BHkbjaiH7bGL86PgiCq",
+      "kind": "status",
+      "rawType": "session.status_running",
+      "status": "running",
+      "at": "2026-09-07T19:43:01.681972Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01ETSDJsDwsvjAhK3TTd7g1v",
+      "kind": "thread",
+      "rawType": "session.thread_status_running",
+      "threadId": "sthr_01TLcYhnBY93DYyzAGphKkVT",
+      "agentName": "just-a-wrapper/default/local",
+      "at": "2026-09-07T19:43:05.075743Z",
+      "detail": {
+        "sub": "status",
+        "status": "running"
+      }
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01VzzaQ8VvmRkXTQdsFS4sej",
+      "kind": "message",
+      "rawType": "user.message",
+      "role": "user",
+      "text": "Generate one image of a blue mug on a white table. Use the image tool.",
+      "at": "2026-09-07T19:43:05.190956Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01CENSutdnuKLkQT6smunuQA",
+      "kind": "span_start",
+      "rawType": "span.model_request_start",
+      "at": "2026-09-07T19:43:05.190957Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_018BzuRmK34oXbSgpVrtSj51",
+      "kind": "thinking",
+      "rawType": "agent.thinking",
+      "at": "2026-09-07T19:43:06.424422Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_016d6ZebWeLWyU13tPpvkGkS",
+      "kind": "tool_use",
+      "rawType": "agent.custom_tool_use",
+      "tool": "custom",
+      "name": "generate_image",
+      "input": {
+        "prompt": "A simple blue ceramic mug sitting on a white table, clean minimalist composition, soft natural lighting, high detail",
+        "size": "square"
+      },
+      "at": "2026-09-07T19:43:07.428232Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01AywbBUE5udsb2zgqXiRGuV",
+      "kind": "usage",
+      "rawType": "span.model_request_end",
+      "usage": {
+        "inputTokens": 2,
+        "outputTokens": 125,
+        "cacheReadInputTokens": 34060,
+        "cacheCreationInputTokens": 391
+      },
+      "at": "2026-09-07T19:43:07.428233Z",
+      "startId": "sevt_01CENSutdnuKLkQT6smunuQA"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_017n14ApXiL1c7nAM2roYtoF",
+      "kind": "thread",
+      "rawType": "session.thread_status_idle",
+      "threadId": "sthr_01TLcYhnBY93DYyzAGphKkVT",
+      "agentName": "just-a-wrapper/default/local",
+      "at": "2026-09-07T19:43:07.606903Z",
+      "detail": {
+        "sub": "status",
+        "status": "idle",
+        "stopReason": "requires_action"
+      }
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01GT7FNUxF8iADZ2bhvJbYED",
+      "kind": "usage_snapshot",
+      "rawType": "session.usage",
+      "usage": {
+        "inputTokens": 2,
+        "outputTokens": 125,
+        "cacheCreationTokens": 391,
+        "cacheReadTokens": 34060
+      },
+      "at": "2026-09-07T19:43:07.606904Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_0115VmL2PY1wP5U9u6t2qpEK",
+      "kind": "status",
+      "rawType": "session.status_idle",
+      "status": "idle",
+      "stopReason": "requires_action",
+      "at": "2026-09-07T19:43:07.606905Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01MccfxnNKT6wu8sNHYC28iU",
+      "kind": "tool_result",
+      "rawType": "user.custom_tool_result",
+      "toolUseId": "sevt_016d6ZebWeLWyU13tPpvkGkS",
+      "isError": false,
+      "text": "{\"image\":{\"url\":\"/api/files/00000000-0000-4000-8000-000000000001/content\",\"filename\":\"a-simple-blue-ceramic-mug-sitting-on-a-white-tab-8127de.png\",\"folderPath\":\"/Generated images\"},\"quality\":\"high\",\"size\":\"square\",\"vendorCostCents\":21.09}",
+      "at": "2026-09-07T19:45:20.738116Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_012MQXRiCW1cTE5Jy1gkb55J",
+      "kind": "status",
+      "rawType": "session.status_running",
+      "status": "running",
+      "at": "2026-09-07T19:45:20.827983Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01AAt8EeWwgZiTn39Lo5nrbF",
+      "kind": "thread",
+      "rawType": "session.thread_status_running",
+      "threadId": "sthr_01TLcYhnBY93DYyzAGphKkVT",
+      "agentName": "just-a-wrapper/default/local",
+      "at": "2026-09-07T19:45:20.827984Z",
+      "detail": {
+        "sub": "status",
+        "status": "running"
+      }
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_0193TpU43DH8e9TrLPvv431v",
+      "kind": "span_start",
+      "rawType": "span.model_request_start",
+      "at": "2026-09-07T19:45:20.930164Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01WkZq4RCxp2x4v1Bp3sm7EZ",
+      "kind": "message",
+      "rawType": "agent.message",
+      "role": "assistant",
+      "text": "Here's your blue mug on a white table, saved to the Library under Generated images.",
+      "at": "2026-09-07T19:45:22.066998Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01R7MJs5CbNSnVqRT3vPS149",
+      "kind": "usage",
+      "rawType": "span.model_request_end",
+      "usage": {
+        "inputTokens": 2,
+        "outputTokens": 27,
+        "cacheReadInputTokens": 34451,
+        "cacheCreationInputTokens": 308
+      },
+      "at": "2026-09-07T19:45:22.066999Z",
+      "startId": "sevt_0193TpU43DH8e9TrLPvv431v"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01782D6Ae9WTsZ3Lzbk66jiQ",
+      "kind": "thread",
+      "rawType": "session.thread_status_idle",
+      "threadId": "sthr_01TLcYhnBY93DYyzAGphKkVT",
+      "agentName": "just-a-wrapper/default/local",
+      "at": "2026-09-07T19:45:22.246201Z",
+      "detail": {
+        "sub": "status",
+        "status": "idle",
+        "stopReason": "end_turn"
+      }
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_016eHggFqNyoZamkNE5QguWT",
+      "kind": "usage_snapshot",
+      "rawType": "session.usage",
+      "usage": {
+        "inputTokens": 4,
+        "outputTokens": 152,
+        "cacheCreationTokens": 699,
+        "cacheReadTokens": 68511
+      },
+      "at": "2026-09-07T19:45:22.246202Z"
+    }
+  },
+  {
+    "type": "event",
+    "event": {
+      "id": "sevt_01ELZJFuSTcjpCrtLVQAAXTR",
+      "kind": "status",
+      "rawType": "session.status_idle",
+      "status": "idle",
+      "stopReason": "end_turn",
+      "at": "2026-09-07T19:45:22.246203Z"
+    }
+  }
+]

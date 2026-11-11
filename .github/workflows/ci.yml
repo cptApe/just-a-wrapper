@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  pull_request:
+    branches: [main, production]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+
+# Cancel in-progress runs for the same branch when a new commit lands.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: verify (format, lint, dead code, types, unit tests, schema drift, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Placeholder values that satisfy env.ts validation. Nothing here reaches a real service.
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+      BETTER_AUTH_SECRET: ci_placeholder_secret_at_least_32_chars_long
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: The same gate contributors run locally
+        run: pnpm verify
+
+  integration:
+    name: db-integration (real Postgres via neon wsproxy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: agentcore_test
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d agentcore_test"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 30
+      wsproxy:
+        image: ghcr.io/neondatabase/wsproxy:latest
+        env:
+          # On the GitHub Actions service network, Postgres is reachable by the
+          # service name `postgres` on its container port 5432.
+          APPEND_PORT: "postgres:5432"
+          ALLOW_ADDR_REGEX: ".*"
+          LOG_TRAFFIC: "false"
+        ports:
+          - 54444:80
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: DB-integration tests (vitest, applies real migrations)
+        run: pnpm test:integration
+        env:
+          TEST_DATABASE_URL: postgres://test:test@localhost:55432/agentcore_test
+          TEST_WS_PROXY: localhost:54444/v1
+
+  e2e:
+    name: e2e smoke (playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright smoke tests (starts its own dev server)
+        run: pnpm test:e2e

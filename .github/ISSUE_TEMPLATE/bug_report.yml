@@ -1,0 +1,83 @@
+name: Bug report
+description: Something does not work the way the docs say it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Search [existing issues](https://github.com/cptApe/just-a-wrapper/issues) first.
+        Report security problems privately through **Security > Report a vulnerability**, never here. See [SECURITY.md](https://github.com/cptApe/just-a-wrapper/blob/main/SECURITY.md).
+        Remove API keys, tokens, email addresses and other personal data from everything you paste.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start the app with `pnpm dev`
+        2. Open ...
+        3. Click ...
+        4. See the error
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where it runs
+      options:
+        - Local (pnpm dev)
+        - Vercel
+        - Another host
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Chat and agents
+        - Files and library
+        - Memory and skills
+        - Connected apps (Composio)
+        - Scheduled tasks and notifications
+        - Workspaces, members and sign-in
+        - Billing (Stripe)
+        - Setup, seeding or deploy
+        - Admin console
+        - Other
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: The release tag or `git rev-parse --short HEAD`.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Node.js and pnpm versions, browser, and which optional providers are configured. Names only, never values.
+      placeholder: |
+        Node.js 22.x, pnpm 10.x, Chrome 1xx
+        Providers: Composio, Stripe test mode
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and screenshots
+      description: Server log lines, browser console errors or the trace ID from the error message. Remove secrets first.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I ran `pnpm validate:config` and it reports no problems, or I included its output above.
+        - label: I removed secrets and personal data from this report.
+          required: true

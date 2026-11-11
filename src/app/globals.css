@@ -1,0 +1,953 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Streamdown (chat markdown renderer) ships Tailwind classes in its dist —
+   Tailwind v4 must scan them or its utilities get purged. */
+@source "../../node_modules/streamdown/dist/*.js";
+@source "../../node_modules/@streamdown/code/dist/*.js";
+@source "../../node_modules/@streamdown/math/dist/*.js";
+
+/* Tailwind v4 defaults the `dark:` variant to the OS media query. We drive dark
+   mode from a `.dark` class on <html> (next-themes, attribute="class") so the
+   user can override the OS preference, so re-point the variant at the class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =====================================================================
+   Tokens. `:root` is the light
+   theme; `.dark` below overrides it. This file is the only source of the theme.
+   ===================================================================== */
+
+:root {
+  /* ---------- Neutral spine — `0 0% N%` triplets so they interop
+                with `hsl(var(--x) / <alpha>)` ---------- */
+  --neutral-0: 30 14.29% 97.25%; /* #f9f8f7  page bg (warm) */
+  --neutral-3: 20 13.04% 95.49%; /* #f5f3f2  sidebar (warm, one notch deeper) */
+  --neutral-5: 0 0% 100%; /* #ffffff  card: the chat input and raised blocks lift white off the warm page */
+  --neutral-7: 0 0% 100%; /* #ffffff  dialog */
+  --neutral-10: 0 0% 88%; /* #e0e0e0  strong fill */
+  --neutral-30: 0 0% 60%; /* tertiary text */
+  --neutral-40: 0 0% 58%;
+  --neutral-50: 0 0% 42%; /* muted text: 4.5:1 on the popover notch, 5.3:1 on white */
+  --neutral-60: 0 0% 36%;
+  --neutral-100: 0 0% 8%; /* #141414  body text */
+
+  /* ---------- Status — success / warning / destructive. Each role has three
+                forms: the base (text, icons, outlines), `-soft` (a translucent
+                tint for chips and banners that works over any surface) and
+                `-strong` (a saturated fill or glyph that must read at a glance;
+                white text holds AA on destructive-strong). Vivid hues follow
+                the 500 palette in light and 400 in dark; text-bearing bases
+                deepen only as needed for AA on tinted surfaces. ---------- */
+  --success-hsl: 142 85% 25%;
+  --success: hsl(var(--success-hsl));
+  --success-soft: hsl(142 80% 45% / 0.16);
+  --success-strong: hsl(142 71% 45%); /* Tailwind green-500: the connected check must read bright */
+  --warning-hsl: 38 100% 28%;
+  --warning: hsl(var(--warning-hsl));
+  --warning-soft: hsl(45 100% 50% / 0.2);
+  --warning-strong: hsl(38 100% 37%);
+  /* Tailwind red-500: the deeper red read as invisible in menus.
+     `-strong` is red-600 so white labels stay readable on filled buttons. */
+  --destructive-hsl: 0 84% 60%;
+  --destructive: hsl(var(--destructive-hsl));
+  --destructive-soft: hsl(var(--destructive-hsl) / 0.14);
+  --destructive-strong: hsl(0 72% 51%);
+  --badge: #ff4d4d;
+  --badge-foreground: #ffffff;
+
+  --info: hsl(217 92% 44%);
+  --info-soft: hsl(217 92% 54% / 0.14);
+  --info-strong: hsl(217 92% 54%);
+  --switch-checked: hsl(142 80% 35%);
+  --switch-foreground: hsl(0 0% 100%);
+
+  /* ---------- File types — the glyph colours that tell document kinds apart
+                at a glance (the attachment convention: red PDF, blue document,
+                green sheet, orange slides, violet code, pink image, teal
+                audio). Glyph-only: tiles, rows and selection keep their
+                neutral fills, and shape + caption carry the type too, so
+                these hold the 3:1 graphical-object bar, not text AA. ---------- */
+  --file-pdf: hsl(4 90% 54%);
+  --file-document: hsl(217 92% 54%);
+  --file-sheet: hsl(150 80% 32%);
+  --file-slides: hsl(28 98% 41%);
+  --file-code: hsl(262 88% 60%);
+  --file-image: hsl(330 92% 54%);
+  --file-audio: hsl(190 96% 34%);
+
+  /* Setup commands on the home page. The block stays dark in both themes. */
+  --code-surface: hsl(0 0% 9%);
+  --code-plain: hsl(0 0% 88%);
+  --code-comment: hsl(0 0% 64%);
+  --code-command: hsl(152 42% 68%);
+  --code-string: hsl(38 72% 72%);
+
+  /* ---------- Schedules — the saturated tile and calendar palette people pick
+                from. The same in both themes, under white icons. ---------- */
+  --schedule-green: #72b900;
+  --schedule-orange: #f35b22;
+  --schedule-blue: #0077ed;
+  --schedule-emerald: #059b52;
+  --schedule-violet: #8b42e8;
+  --schedule-pink: #e92c95;
+  --schedule-amber: #e49400;
+  --schedule-indigo: #5343e8;
+  --schedule-slate: #667085;
+  --schedule-red: #e23a32;
+  --schedule-yellow: #efc32c;
+  --schedule-cyan: #00a7b5;
+  --schedule-blue-hover: #0064c9;
+  --schedule-focus: #0095ff;
+  --schedule-review-pass: #087c45;
+  --schedule-review-fail: #d93426;
+
+  /* ---------- Media — the same in both themes because they sit over images,
+                video, documents and dialog backdrops, not over the page.
+                overlay = dialog backdrop; scrim = pills and veils over media;
+                media-bed = letterbox behind video; on-media = text over any
+                of those; paper = a document canvas (PDF, HTML, logo tile). */
+  --overlay: hsl(0 0% 0% / 0.6);
+  --scrim: hsl(0 0% 0% / 0.55);
+  --media-bed: hsl(0 0% 0%);
+  --on-media: hsl(0 0% 100%);
+  --paper: hsl(0 0% 100%);
+  --paper-foreground: hsl(0 0% 8%);
+
+  /* ---------- Text — exactly three steps carry all hierarchy:
+                foreground / muted-foreground / tertiary (placeholders,
+                inactive tabs). ---------- */
+  --foreground-tertiary: hsl(var(--neutral-30));
+
+  /* ---------- Alpha ramp — borders, hover fills, focus rings. ---------- */
+  --alpha-3: 0 0% 0% / 3%; /* whisper fill (empty-state container) */
+  --alpha-6: 0 0% 0% / 6%; /* card hover */
+  --alpha-8: 0 0% 0% / 8%; /* divider, border */
+  --alpha-12: 0 0% 0% / 12%;
+  --alpha-16: 0 0% 0% / 16%; /* secondary button inset outline */
+  --alpha-24: 0 0% 0% / 24%; /* focus ring */
+
+  /* ---------- Semantic roles (shadcn names) ----------
+     Four background roles: background (page) and sidebar are the warm bed;
+     card (the chat input, raised blocks) and popover (dialogs, sheets,
+     floating panels) are white and lift off it. --primary is the brand colour
+     and the primary button fill; it is its own value so a deployment can change it
+     without touching text. --accent keeps its shadcn meaning: the quiet fill
+     for hover, focus and selected rows. --attention is the one coloured
+     accent: link hover/focus and unread markers, never button fills or row
+     highlights, so a deployment can tune "look here" without touching either. */
+  --background: hsl(var(--neutral-0));
+  --foreground: hsl(var(--neutral-100));
+  --sidebar: hsl(var(--neutral-3));
+  --sidebar-foreground: hsl(var(--neutral-100));
+  --sidebar-accent: hsl(var(--alpha-6));
+  --sidebar-accent-foreground: hsl(var(--neutral-100));
+  --sidebar-border: hsl(var(--alpha-8));
+  --card: hsl(var(--neutral-5));
+  --card-foreground: hsl(var(--neutral-100));
+  --popover: hsl(var(--neutral-7));
+  --popover-foreground: hsl(var(--neutral-100));
+  --primary: hsl(0 0% 8%); /* brand colour; black by default */
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(var(--alpha-6));
+  --secondary-foreground: hsl(var(--neutral-100));
+  --muted: hsl(var(--alpha-6));
+  --muted-foreground: hsl(var(--neutral-50));
+  --accent: hsl(var(--alpha-6));
+  --accent-foreground: hsl(var(--neutral-100));
+  /* Saturated blue, deepened to keep link text at AA. */
+  --attention: hsl(217 92% 44%);
+  --destructive-foreground: hsl(0 0% 100%); /* white on the deep light-theme red */
+  --border: hsl(var(--alpha-8));
+  --input: hsl(var(--alpha-8));
+  --ring: hsl(var(--alpha-24));
+
+  /* ---------- Charts — the neutral spine and the status palette, ordered
+                for clean categorical separation. ---------- */
+  --chart-1: hsl(var(--neutral-100));
+  --chart-2: hsl(var(--neutral-50));
+  --chart-3: hsl(var(--warning-hsl));
+  --chart-4: hsl(var(--neutral-30));
+  --chart-5: hsl(var(--success-hsl));
+  --chart-6: hsl(var(--destructive-hsl));
+
+  /* ---------- Radii — one configured value, four derived sizes. `--radius-base`
+                is the corner radius each deployment sets; the sizes keep their
+                ratio (0.6 / 1 / 1.6 / 2.4) so the app stays consistent at any
+                setting. Buttons and pill controls have their own radius:
+                9999px is a pill; any px value squares them off. ---------- */
+  --radius-base: 10px;
+  --radius-sm: calc(var(--radius-base) * 0.6); /* 6px: chips, kbd, badges */
+  --radius-md: var(--radius-base); /* 10px: rows, menu items, inputs */
+  --radius-lg: calc(var(--radius-base) * 1.6); /* 16px: cards, popovers, composer */
+  --radius-xl: calc(var(--radius-base) * 2.4); /* 24px: dialogs, sheets, menus */
+  --radius-button: 9999px;
+
+  /* ---------- Z-scale — the only sanctioned stacking values ---------- */
+  --z-sticky: 30;
+  --z-dropdown: 40;
+  --z-dialog: 50;
+  --z-toast: 60;
+
+  /* One shared column width keeps app pages aligned. */
+  --page-max-w: 960px;
+  --page-max-w-reading: var(--page-max-w);
+  --page-max-w-content: var(--page-max-w);
+  --page-max-w-wide: var(--page-max-w);
+  --sidebar-w: 264px;
+  --sidebar-w-collapsed: 60px; /* px-2 + 44px circle + px-2 — same gutter as expanded, no icon shift */
+
+  /* ---------- Shadows — floating layers ONLY (menus/popovers). Resting
+                surfaces never carry shadows; modals separate via overlay. ---------- */
+  --shadow-popover: 0 0 0 1px hsl(var(--alpha-6)), 0 4px 32px rgb(0 0 0 / 0.08);
+
+  /* ---------- Glass — the floating-menu surface. Menus and the notification
+                panel are dark glass in BOTH themes, so these don't get a .dark
+                override. ---------- */
+  --glass-bg: hsl(0 0% 15% / 0.88);
+  --glass-bg-hover: hsl(0 0% 93% / 0.08);
+  --glass-fg: hsl(0 0% 100%);
+  --glass-fg-foreground: hsl(0 0% 8%); /* ink on a glass-fg fill (the menu's light button) */
+  --glass-fg-secondary: hsl(0 0% 68%);
+  --glass-fg-tertiary: hsl(0 0% 53%);
+  --glass-separator: hsl(0 0% 93% / 0.08);
+  --shadow-glass: 0 12px 80px rgb(0 0 0 / 0.16);
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-ios-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring-bouncy: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 150ms;
+  --duration-med: 200ms;
+  --duration-slow: 300ms;
+  --duration-sheet: 500ms;
+
+  /* ---------- Typography ---------- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* =====================================================================
+   Dark theme — mirror of the light spine, inverted. The neutral ramp is
+   flipped (0 = near-black page bg … 100 = near-white body text) and the
+   alpha ramp switches from black-on-light to white-on-dark so borders,
+   hover fills, and focus rings stay visible on dark surfaces. Status colours
+   lift slightly in lightness for legibility on dark.
+   Applied via the `.dark` class on <html> (next-themes).
+   ===================================================================== */
+
+.dark {
+  /* ---------- Neutral spine — inverted: low index = dark, high = light ---------- */
+  --neutral-0: 0 0% 7%; /* #121212  page bg */
+  --neutral-3: 0 0% 9%; /* app body */
+  --neutral-5: 0 0% 12%; /* card on dark */
+  --neutral-7: 0 0% 15%; /* modal */
+  --neutral-10: 0 0% 18%; /* strong fill */
+  --neutral-30: 0 0% 36%;
+  --neutral-40: 0 0% 46%; /* tertiary text */
+  --neutral-50: 0 0% 60%; /* muted text */
+  --neutral-60: 0 0% 68%;
+  --neutral-100: 0 0% 96%; /* #f5f5f5  body text */
+
+  /* ---------- Status — lifted for dark legibility; soft tints brighten a
+                notch over near-black; strong stays saturated ---------- */
+  --success-hsl: 142 76% 60%;
+  --success: hsl(var(--success-hsl));
+  --success-soft: hsl(var(--success-hsl) / 0.16);
+  --success-strong: hsl(142 76% 60%);
+  --warning-hsl: 45 96% 62%;
+  --warning: hsl(var(--warning-hsl));
+  --warning-soft: hsl(var(--warning-hsl) / 0.16);
+  --warning-strong: hsl(45 96% 62%);
+  --destructive-hsl: 0 96% 74%;
+  --destructive: hsl(var(--destructive-hsl));
+  --destructive-soft: hsl(var(--destructive-hsl) / 0.16);
+  --destructive-strong: hsl(0 90% 48%);
+  --badge: #ff4d4d;
+  --badge-foreground: #ffffff;
+
+  --info: hsl(213 94% 68%);
+  --info-soft: hsl(213 94% 68% / 0.16);
+  --info-strong: hsl(213 94% 68%);
+  --switch-checked: hsl(142 76% 60%);
+  --switch-foreground: hsl(0 0% 7%);
+
+  /* ---------- File types — lifted for legibility on near-black ---------- */
+  --file-pdf: hsl(0 96% 72%);
+  --file-document: hsl(213 94% 68%);
+  --file-sheet: hsl(150 78% 58%);
+  --file-slides: hsl(30 100% 62%);
+  --file-code: hsl(258 95% 76%);
+  --file-image: hsl(330 100% 72%);
+  --file-audio: hsl(190 90% 58%);
+
+  /* ---------- Text tertiary — ~50% white over near-black ---------- */
+  --foreground-tertiary: hsl(var(--neutral-40));
+
+  /* ---------- Popover shadow — dark needs the hairline seam more than the
+                blur; alpha ring steps up via the dark ramp ---------- */
+  --shadow-popover: 0 0 0 1px hsl(var(--alpha-8)), 0 4px 32px rgb(0 0 0 / 0.32);
+
+  /* ---------- Alpha ramp — white-based on dark ---------- */
+  --alpha-3: 0 0% 100% / 3%;
+  --alpha-6: 0 0% 100% / 6%;
+  --alpha-8: 0 0% 100% / 10%;
+  --alpha-12: 0 0% 100% / 14%;
+  --alpha-16: 0 0% 100% / 18%;
+  --alpha-24: 0 0% 100% / 28%;
+
+  /* ---------- Semantic roles (same structure as :root) ---------- */
+  --background: hsl(var(--neutral-0));
+  --foreground: hsl(var(--neutral-100));
+  --sidebar: hsl(var(--neutral-3));
+  --sidebar-foreground: hsl(var(--neutral-100));
+  --sidebar-accent: hsl(var(--alpha-6));
+  --sidebar-accent-foreground: hsl(var(--neutral-100));
+  --sidebar-border: hsl(var(--alpha-8));
+  --card: hsl(var(--neutral-5));
+  --card-foreground: hsl(var(--neutral-100));
+  --popover: hsl(var(--neutral-7));
+  --popover-foreground: hsl(var(--neutral-100));
+  --primary: hsl(0 0% 96%); /* brand colour; white by default on dark */
+  --primary-foreground: hsl(0 0% 7%);
+  --secondary: hsl(var(--alpha-6));
+  --secondary-foreground: hsl(var(--neutral-100));
+  --muted: hsl(var(--alpha-6));
+  --muted-foreground: hsl(var(--neutral-50));
+  --accent: hsl(var(--alpha-6));
+  --accent-foreground: hsl(var(--neutral-100));
+  /* Lifted blue keeps links legible on dark surfaces. */
+  --attention: hsl(213 94% 68%);
+  --destructive-foreground: hsl(var(--neutral-0)); /* near-black on the lifted dark red */
+  --border: hsl(var(--alpha-8));
+  --input: hsl(var(--alpha-8));
+  --ring: hsl(var(--alpha-24));
+
+  /* ---------- Charts — same semantic order, with dark-theme palette values. ---------- */
+  --chart-1: hsl(var(--neutral-100));
+  --chart-2: hsl(var(--neutral-60));
+  --chart-3: hsl(var(--warning-hsl));
+  --chart-4: hsl(var(--neutral-40));
+  --chart-5: hsl(var(--success-hsl));
+  --chart-6: hsl(var(--destructive-hsl));
+}
+
+/* =====================================================================
+   @theme inline — bind tokens to Tailwind v4's theme so utilities like
+   `bg-card`, `text-foreground`, `border-border`, `rounded-lg` resolve.
+   ===================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-attention: var(--attention);
+  --color-badge: var(--badge);
+  --color-badge-foreground: var(--badge-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Alpha-ramp utilities keep component classes on named tokens instead of
+     rebuilding the same hsl() expressions at every call site. */
+  --color-alpha-3: hsl(var(--alpha-3));
+  --color-alpha-6: hsl(var(--alpha-6));
+  --color-alpha-8: hsl(var(--alpha-8));
+  --color-alpha-12: hsl(var(--alpha-12));
+  --color-alpha-16: hsl(var(--alpha-16));
+  --color-alpha-24: hsl(var(--alpha-24));
+
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-strong: var(--info-strong);
+  --color-switch-checked: var(--switch-checked);
+  --color-switch-foreground: var(--switch-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-strong: var(--success-strong);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-strong: var(--warning-strong);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-schedule-green: var(--schedule-green);
+  --color-schedule-orange: var(--schedule-orange);
+  --color-schedule-blue: var(--schedule-blue);
+  --color-schedule-emerald: var(--schedule-emerald);
+  --color-schedule-violet: var(--schedule-violet);
+  --color-schedule-pink: var(--schedule-pink);
+  --color-schedule-amber: var(--schedule-amber);
+  --color-schedule-indigo: var(--schedule-indigo);
+  --color-schedule-slate: var(--schedule-slate);
+  --color-schedule-red: var(--schedule-red);
+  --color-schedule-yellow: var(--schedule-yellow);
+  --color-schedule-cyan: var(--schedule-cyan);
+  --color-schedule-blue-hover: var(--schedule-blue-hover);
+  --color-schedule-focus: var(--schedule-focus);
+  --color-schedule-review-pass: var(--schedule-review-pass);
+  --color-schedule-review-fail: var(--schedule-review-fail);
+  --color-destructive-strong: var(--destructive-strong);
+  --color-foreground-tertiary: var(--foreground-tertiary);
+
+  /* File-type glyph utilities: text-file-pdf, text-file-document, … */
+  --color-file-pdf: var(--file-pdf);
+  --color-file-document: var(--file-document);
+  --color-file-sheet: var(--file-sheet);
+  --color-file-slides: var(--file-slides);
+  --color-file-code: var(--file-code);
+  --color-file-image: var(--file-image);
+  --color-file-audio: var(--file-audio);
+  --color-code-surface: var(--code-surface);
+  --color-code-plain: var(--code-plain);
+  --color-code-comment: var(--code-comment);
+  --color-code-command: var(--code-command);
+  --color-code-string: var(--code-string);
+
+  --color-overlay: var(--overlay);
+  --color-scrim: var(--scrim);
+  --color-media-bed: var(--media-bed);
+  --color-on-media: var(--on-media);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+
+  /* Only the four sanctioned sizes exist; Tailwind's own xs/2xl/3xl are
+     cleared so a stray class renders no radius instead of a foreign one. */
+  --radius-*: initial;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-button: var(--radius-button);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* ---------- Type scale — role utilities. text-title-page,
+     text-body, etc. resolve as font-size utilities carrying their own
+     line-height / weight / tracking. ---------- */
+  --text-title-page: 32px; /* the one page title — big but light */
+  --text-title-page--line-height: 38px;
+  --text-title-page--font-weight: 450;
+  --text-title-page--letter-spacing: -0.4px;
+  --text-title-section: 18px; /* section heads inside a page */
+  --text-title-section--line-height: 24px;
+  --text-title-section--font-weight: 600;
+  --text-title-card: 14px; /* card/list-item titles */
+  --text-title-card--line-height: 20px;
+  --text-title-card--font-weight: 500;
+  --text-body-lg: 16px; /* primary content + "bigger" chrome */
+  --text-body-lg--line-height: 24px;
+  --text-body-lg--letter-spacing: -0.011em;
+  --text-body: 15px; /* default UI text */
+  --text-body--line-height: 22px;
+  --text-count: 12px; /* compact numeric count badges */
+  --text-count--line-height: 1;
+  --text-count--font-weight: 600;
+  --text-meta: 13px; /* muted metadata, descriptions */
+  --text-meta--line-height: 18px;
+
+  /* ---------- Z-scale utilities: z-sticky / z-dropdown / z-dialog / z-toast.
+     No z literals in components. ---------- */
+  --z-index-sticky: var(--z-sticky);
+  --z-index-dropdown: var(--z-dropdown);
+  --z-index-dialog: var(--z-dialog);
+  --z-index-toast: var(--z-toast);
+
+  /* ---------- Page column: max-w-page (the reading and content aliases resolve to the same
+       single width — see the layout tokens above) ---------- */
+  --container-page: var(--page-max-w);
+  --container-page-reading: var(--page-max-w-reading);
+  --container-page-content: var(--page-max-w-content);
+  --container-page-wide: var(--page-max-w-wide);
+
+  /* ---------- shadow-popover — the one sanctioned floating shadow;
+       shadow-glass pairs with the glass menu surface ---------- */
+  --shadow-popover: var(--shadow-popover);
+  --shadow-glass: var(--shadow-glass);
+
+  /* ---------- Glass surface utilities: bg-glass, text-glass-fg, … ---------- */
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-hover: var(--glass-bg-hover);
+  --color-glass-fg: var(--glass-fg);
+  --color-glass-fg-foreground: var(--glass-fg-foreground);
+  --color-glass-fg-secondary: var(--glass-fg-secondary);
+  --color-glass-fg-tertiary: var(--glass-fg-tertiary);
+  --color-glass-separator: var(--glass-separator);
+}
+
+/* =====================================================================
+   Base layer
+   ===================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Sticky-page focus ring won't be cropped by sticky nav. */
+    scroll-padding-top: 96px;
+    /* No grey iOS tap flash — presses get intentional feedback (button
+       active:scale, hover fills), never the default Safari highlight box. */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
+  /* Kill the 300ms tap delay on interactive elements so touch presses register
+     immediately (iOS Safari / Android). Button already carries touch-manipulation
+     via its variants; this covers links, inputs, and role=button call sites. */
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "ss01", "cv01", "cv02";
+  }
+
+  /* Tailwind v4 drops cursor:pointer on <button> — restore it for interactive
+     elements. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  /* Radix menu / select / tab items render as role=menuitem|option|etc, not
+     <button>, so they miss the rule above — restore the pointer on them too. */
+    [role="menuitem"]:not([data-disabled]),
+  [role="menuitemcheckbox"]:not([data-disabled]),
+  [role="menuitemradio"]:not([data-disabled]),
+  [role="option"]:not([data-disabled]),
+  [role="tab"]:not([data-disabled]),
+  a[href],
+  summary,
+  label[for],
+  select:not(:disabled),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Display headlines balance their wrap. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Numbers that change should never reflow. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Press feedback for every button-shaped control, not only the shared
+     Button primitive: anything on the button radius that is actually
+     pressable shrinks 3% while held. Triggers of an open overlay, which is
+     positioned from the trigger's rect, disabled controls and
+     static shapes (skeletons, tracks) are excluded. Uses the `scale` property,
+     the same one Tailwind's scale utilities set, so a control that also carries
+     active:scale-* is not shrunk twice. No transition: press feedback snaps,
+     the same as the shared Button. */
+  :where(
+      button,
+      a,
+      [role="button"],
+      [role="radio"],
+      [role="tab"],
+      [role="menuitem"]
+    ).rounded-button:active:not(:disabled):not([aria-disabled="true"]):not([aria-expanded="true"]) {
+    scale: 0.97;
+  }
+}
+
+/* =====================================================================
+   Reduced-motion floor — every transition collapses to ~0ms.
+   Components that can't be made instant should call `useReducedMotion()`.
+   ===================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================================
+   Custom scrollbar, app-wide. Thin rounded thumb on a transparent track;
+   the thumb color rides the alpha tokens, so both themes resolve it without
+   extra rules. The 3px transparent border + content-box clip inset the thumb
+   from the edge.
+   ===================================================================== */
+
+* {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: hsl(var(--alpha-16)) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--alpha-16));
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--alpha-24));
+}
+
+/* =====================================================================
+   scroll-fade — copied verbatim from shadcn's scroll-fade utility
+   (shadcn-ui/ui: packages/shadcn/src/tailwind.css), vertical subset only
+   (the base `scroll-fade` fades both top + bottom). CSS-only: `mask-image`
+   dissolves the content itself and scroll-driven animations track the
+   position, so the fades reveal at each edge only when there's overflow
+   past it — no React/JS visibility signal. Falls back to a static both-edge
+   fade where `animation-timeline: scroll()` is unsupported. Horizontal /
+   single-edge variants were not copied; add them here if a consumer needs
+   them.
+   ===================================================================== */
+@property --scroll-fade-t {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-b {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-mask {
+  syntax: "*";
+  inherits: false;
+}
+
+@theme inline {
+  @keyframes scroll-fade-reveal-t {
+    from {
+      --scroll-fade-t: 0px;
+    }
+    to {
+      --scroll-fade-t: var(
+        --_scroll-fade-size-t,
+        var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)))
+      );
+    }
+  }
+  @keyframes scroll-fade-reveal-b {
+    from {
+      --scroll-fade-b: var(
+        --_scroll-fade-size-b,
+        var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)))
+      );
+    }
+    to {
+      --scroll-fade-b: 0px;
+    }
+  }
+}
+
+/* One focus recipe for standalone text fields. Composite controls can keep
+   their existing ring-0 override when their surrounding frame owns focus. */
+@layer components {
+  .field-focus {
+    @apply outline-none;
+
+    &:focus-visible {
+      @apply ring-2 ring-ring ring-offset-1 ring-offset-background;
+    }
+  }
+}
+
+@utility scroll-fade {
+  --_scroll-fade-size-t: var(
+    --scroll-fade-t-size,
+    var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)))
+  );
+  --_scroll-fade-size-b: var(
+    --scroll-fade-b-size,
+    var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)))
+  );
+  --scroll-fade-block: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--scroll-fade-t, 0px),
+    #000 calc(100% - var(--scroll-fade-b, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-image: var(--scroll-fade-mask, var(--scroll-fade-block));
+  mask-image: var(--scroll-fade-mask, var(--scroll-fade-block));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-t 1ms ease-in-out,
+      scroll-fade-reveal-b 1ms ease-in-out;
+    animation-timeline: scroll(self y), scroll(self y);
+    animation-range:
+      0 var(--scroll-fade-reveal, calc(var(--spacing) * 24)),
+      calc(100% - var(--scroll-fade-reveal, calc(var(--spacing) * 24))) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-t: var(--_scroll-fade-size-t);
+    --scroll-fade-b: var(--_scroll-fade-size-b);
+  }
+}
+
+/* scroll-fade-x — the horizontal twin of scroll-fade above (left + right
+   edges), for rows that scroll sideways (the chat component state tabs).
+   Same mechanics: mask-image dissolves the content at each edge only while
+   there is overflow past it, driven by scroll(self x); static both-edge
+   fade where scroll-driven animations are unsupported. */
+@property --scroll-fade-l {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-r {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@theme inline {
+  @keyframes scroll-fade-reveal-l {
+    from {
+      --scroll-fade-l: 0px;
+    }
+    to {
+      --scroll-fade-l: var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)));
+    }
+  }
+  @keyframes scroll-fade-reveal-r {
+    from {
+      --scroll-fade-r: var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)));
+    }
+    to {
+      --scroll-fade-r: 0px;
+    }
+  }
+}
+
+@utility scroll-fade-x {
+  --scroll-fade-inline: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--scroll-fade-l, 0px),
+    #000 calc(100% - var(--scroll-fade-r, 0px)),
+    transparent 100%
+  );
+  -webkit-mask-image: var(--scroll-fade-inline);
+  mask-image: var(--scroll-fade-inline);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  @supports (animation-timeline: scroll()) {
+    animation:
+      scroll-fade-reveal-l 1ms ease-in-out,
+      scroll-fade-reveal-r 1ms ease-in-out;
+    animation-timeline: scroll(self x), scroll(self x);
+    animation-range:
+      0 var(--scroll-fade-reveal, calc(var(--spacing) * 24)),
+      calc(100% - var(--scroll-fade-reveal, calc(var(--spacing) * 24))) 100%;
+    animation-fill-mode: both;
+  }
+
+  @supports not (animation-timeline: scroll()) {
+    --scroll-fade-l: var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)));
+    --scroll-fade-r: var(--scroll-fade-size, min(12%, calc(var(--spacing) * 10)));
+  }
+}
+
+/* =====================================================================
+   shimmer — copied verbatim from shadcn's shimmer utility
+   (shadcn-ui/ui: packages/shadcn/src/tailwind.css). A moving highlight
+   swept across the element's text via a background-clip:text gradient —
+   drives the "uploading / processing" loading feel on Attachment titles and
+   the streaming Marker status row. Text
+   only (background-clip:text); apply to the text node, not its container.
+   ===================================================================== */
+@property --shimmer-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 20deg;
+}
+@property --shimmer-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --shimmer-text-fill {
+  syntax: "*";
+  inherits: false;
+}
+
+@theme inline {
+  @keyframes tw-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+}
+
+@utility shimmer {
+  --_spread: var(--shimmer-spread, calc(3ch + 40px));
+  --_base: currentColor;
+  --_highlight: var(--shimmer-color, oklch(from currentColor l c h / calc(alpha * 0.2)));
+
+  background-image: var(
+    --shimmer-image,
+    linear-gradient(
+      calc(90deg + var(--shimmer-angle)),
+      var(--_base) calc(50% - var(--_spread)),
+      color-mix(in oklch, var(--_highlight), var(--_base) 50%) calc(50% - var(--_spread) * 0.5),
+      var(--_highlight) 50%,
+      color-mix(in oklch, var(--_highlight), var(--_base) 50%) calc(50% + var(--_spread) * 0.5),
+      var(--_base) calc(50% + var(--_spread))
+    )
+  );
+  background-repeat: no-repeat;
+  background-size: calc(200% + var(--_spread) * 2) 100%;
+  background-position: 0 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: var(--shimmer-text-fill, transparent);
+  animation: tw-shimmer var(--shimmer-duration, 2s) linear infinite;
+
+  @variant dark {
+    --_highlight: var(
+      --shimmer-color,
+      oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.4))
+    );
+  }
+
+  &:where([dir="rtl"], [dir="rtl"] *) {
+    animation-direction: reverse;
+  }
+}
+
+/* =====================================================================
+   canvas-push-region — the /app layout wrapper that SHARES space with an
+   open floating side canvas (09-modals canvas presentation, `floating`).
+   The Modal family sets --overlay-canvas-push on the root while a floating
+   canvas is open at push-capable viewport widths; content reflows beside
+   the card instead of being occluded. Duration mirrors the canvas motion
+   (500ms in / 300ms out, 0ms while dragging the resize handle); the global
+   reduced-motion floor above collapses it like every other transition.
+   ===================================================================== */
+@utility canvas-push-region {
+  padding-right: var(--overlay-canvas-push, 0px);
+  transition: padding-right var(--overlay-canvas-push-duration, 500ms) var(--ease-ios-sheet);
+}
+
+/* =====================================================================
+   Public home page. All motion sits behind no-preference, so reduced
+   motion and browsers without view timelines show the finished page.
+   ===================================================================== */
+
+@utility landing-display {
+  font-weight: 500;
+  letter-spacing: -0.028em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes landing-rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @keyframes landing-beat {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    12%,
+    88% {
+      opacity: 1;
+    }
+  }
+
+  .landing-rise {
+    animation: landing-rise 700ms var(--ease-out) var(--landing-delay, 0ms) both;
+  }
+
+  /* A state that exists only while the task runs. It is hidden at rest, so
+     reduced motion lands on the finished screen. */
+  .landing-beat {
+    animation: landing-beat var(--landing-hold, 1000ms) ease-in-out var(--landing-delay, 0ms) both;
+  }
+
+  @supports (animation-timeline: view()) {
+    @keyframes landing-settle {
+      from {
+        opacity: 0.4;
+        transform: translateY(56px) scale(0.97);
+      }
+    }
+
+    .landing-settle {
+      animation: landing-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+/* The one phone top bar sits below the iOS status bar (viewportFit: cover
+   paints under it) and keeps a small gap where there is no inset. */
+@utility mobile-top-inset {
+  @media (width < 48rem) {
+    padding-top: max(env(safe-area-inset-top), 0.5rem);
+  }
+}
